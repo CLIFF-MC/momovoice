@@ -1,0 +1,6 @@
+{
+  "name": "MTN MoMo Accessible Voice Financial Assistant",
+  "description": "Accessible voice-driven financial assistant for blind and low-vision users, featuring TalkBack simulation, speech recognition, spoken guidance, and secure MTN MoMo sandbox transfer workflows.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom Accessibility & High Contrast overrides */
+.high-contrast-mode {
+  --bg-primary: #000000;
+  --bg-card: #0a0a0a;
+  --text-primary: #FFFF00;
+  --text-secondary: #FFFFFF;
+  --border-focus: #FFFF00;
+}
+
+.high-contrast-mode button,
+.high-contrast-mode input {
+  border-width: 2px !important;
+}
+
+/* Accessible focus visible rings */
+:focus-visible {
+  outline: 3px solid #FFCC00;
+  outline-offset: 3px;
+}
+
+/* Custom clean scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
