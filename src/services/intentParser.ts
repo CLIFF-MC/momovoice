@@ -79,6 +79,38 @@ const SPOKEN_DIGIT_MAP: Record<string, string> = {
   yopɔin: '7',
   nii: '8',
   wai: '9',
+
+  // Hausa
+  sifili: '0',
+  daya: '1',
+  biyu: '2',
+  uku: '3',
+  hudu: '4',
+  biyar: '5',
+  shida: '6',
+  bakwai: '7',
+  takwas: '8',
+  tara: '9',
+
+  // Krachi (Kaakyi - Oti Region)
+  koo: '1',
+  anyɔ: '2',
+  asa: '3',
+  anaa: '4',
+  anoo: '5',
+  asiee: '6',
+  asono: '7',
+  akwee: '8',
+  akpuno: '9',
+
+  // Buem (Lɛlɛmi - Oti Region)
+  kuko: '1',
+  anɔ: '5',
+  asie: '6',
+  asunɔ: '7',
+  anyani: '8',
+  anyana: '9',
+  lefu: '10',
 };
 
 // Ghanaian KYC MoMo Registered Directory simulation
@@ -151,7 +183,7 @@ export function parseUserSpeech(
 ): ParseResult {
   const normalized = text.trim().toLowerCase();
 
-  // 1. Check for Repeat in English, Twi, Fante, Ewe, Ga, Dagbani
+  // 1. Check for Repeat in English, Twi, Fante, Ewe, Ga, Dagbani, Hausa, Krachi
   if (
     normalized.includes('repeat') ||
     normalized.includes('say again') ||
@@ -164,9 +196,73 @@ export function parseUserSpeech(
     normalized.includes('gbugbɔ') ||
     normalized.includes('kɛɛ ekoŋŋ') ||
     normalized.includes('tsɔɔmɔ mi') ||
-    normalized.includes('labi yeli')
+    normalized.includes('labi yeli') ||
+    normalized.includes('sake fada') ||
+    normalized.includes('maimaita') ||
+    normalized.includes('mesan ka')
   ) {
     return { intent: 'REPEAT', confidence: 0.98, rawText: text };
+  }
+
+  // 1b. Check for Slower
+  if (
+    normalized.includes('slower') ||
+    normalized.includes('speak slower') ||
+    normalized.includes('speak slowly') ||
+    normalized.includes('slow down') ||
+    normalized.includes('brɛoo') ||
+    normalized.includes('kasa brɛoo') ||
+    normalized.includes('blewu') ||
+    normalized.includes('bokɔɔ') ||
+    normalized.includes('baŋkpoo') ||
+    normalized.includes('a hankali')
+  ) {
+    return { intent: 'SLOWER', confidence: 0.98, rawText: text };
+  }
+
+  // 1c. Check for Option Selection (e.g. 1st contact vs 2nd contact)
+  if (
+    normalized === '1' ||
+    normalized === 'one' ||
+    normalized === 'first' ||
+    normalized === 'first one' ||
+    normalized === 'number one' ||
+    normalized === '2' ||
+    normalized === 'two' ||
+    normalized === 'second' ||
+    normalized === 'second one' ||
+    normalized === 'number two'
+  ) {
+    return { intent: 'SELECT_OPTION', confidence: 0.95, rawText: text };
+  }
+
+  // 1d. Check for Biometric Choice: Fingerprint
+  if (
+    normalized.includes('fingerprint') ||
+    normalized.includes('finger') ||
+    normalized.includes('thumb') ||
+    normalized.includes('nsateaa') ||
+    normalized.includes('asibidɛ') ||
+    normalized.includes('yatsa') ||
+    normalized.includes('ninɛbii') ||
+    normalized.includes('nuu') ||
+    normalized.includes('yatsan hannu')
+  ) {
+    return { intent: 'CHOOSE_FINGERPRINT', confidence: 0.96, rawText: text };
+  }
+
+  // 1e. Check for Biometric Choice: Face
+  if (
+    normalized.includes('face') ||
+    normalized.includes('face check') ||
+    normalized.includes('face unlock') ||
+    normalized.includes('camera') ||
+    normalized.includes('anim') ||
+    normalized.includes('fuska') ||
+    normalized.includes('ŋku') ||
+    normalized.includes('hie')
+  ) {
+    return { intent: 'CHOOSE_FACE', confidence: 0.96, rawText: text };
   }
 
   // 2. Check for Cancel
@@ -178,28 +274,46 @@ export function parseUserSpeech(
     normalized.includes("don't send") ||
     normalized.includes('dont send') ||
     normalized.includes('abort') ||
-    normalized === 'no' ||
     normalized === 'no cancel' ||
     normalized.includes('gyae') ||
+    normalized.includes('gyaa') ||
     normalized.includes('twa mu') ||
     normalized.includes('twe san') ||
-    normalized === 'dabi' ||
     normalized.includes('dzudzɔ') ||
     normalized.includes('ɖee ɖa') ||
-    normalized === 'ao' ||
-    normalized.includes('kpa') ||
     normalized.includes('tsĩ nɔ') ||
-    normalized.includes('chɛli') ||
-    normalized.includes('zaɣisi')
+    normalized.includes('zaɣisi') ||
+    normalized.includes('soke') ||
+    normalized.includes('ba na so')
   ) {
     return { intent: 'CANCEL', confidence: 0.95, rawText: text };
   }
 
-  // 3. Check for Confirm
+  // 2b. Check for explicit No / Disagree / Deny
+  if (
+    normalized === 'no' ||
+    normalized === 'dabi' ||
+    normalized === "a'a" ||
+    normalized === 'ao' ||
+    normalized === 'wrong' ||
+    normalized.includes('not right') ||
+    normalized.includes("don't allow") ||
+    normalized.includes('dont allow') ||
+    normalized === 'deny' ||
+    normalized.includes('chɛli') ||
+    normalized.includes('kpa') ||
+    normalized.includes('ba haka ba')
+  ) {
+    return { intent: 'ANSWER_NO', confidence: 0.95, rawText: text };
+  }
+
+  // 3. Check for Confirm / Yes / Allow
   if (
     normalized === 'yes' ||
     normalized === 'confirm' ||
     normalized === 'yes confirm' ||
+    normalized === 'allow' ||
+    normalized === 'double tap allow' ||
     normalized.includes('send it') ||
     normalized.includes('proceed') ||
     normalized.includes('authorize') ||
@@ -216,7 +330,14 @@ export function parseUserSpeech(
     normalized.includes('yeda') ||
     normalized === 'iyi' ||
     normalized.includes('di saɣi') ||
-    normalized === 'yoo'
+    normalized === 'yoo' ||
+    normalized === 'eh' ||
+    normalized === 'to' ||
+    normalized.includes('tabbatar') ||
+    normalized === 'ee' ||
+    normalized.includes('that is right') ||
+    normalized === 'right' ||
+    normalized === 'correct'
   ) {
     return { intent: 'CONFIRM_TRANSFER', confidence: 0.95, rawText: text };
   }
@@ -233,7 +354,8 @@ export function parseUserSpeech(
     normalized.includes('mboa') ||
     normalized.includes('kpekpeɖeŋu') ||
     normalized.includes('yelikɛbua') ||
-    normalized.includes('sɔŋsim')
+    normalized.includes('sɔŋsim') ||
+    normalized.includes('taimako')
   ) {
     return { intent: 'HELP', confidence: 0.95, rawText: text };
   }
@@ -254,7 +376,10 @@ export function parseUserSpeech(
     normalized.includes('kwɛmɔ mishika') ||
     normalized.includes('mishika') ||
     normalized.includes('nyama n laɣifu') ||
-    normalized.includes('n laɣifu')
+    normalized.includes('n laɣifu') ||
+    normalized.includes('duba kudi') ||
+    normalized.includes('kudi na') ||
+    normalized.includes('kere me sika')
   ) {
     return { intent: 'BALANCE_CHECK', confidence: 0.95, rawText: text };
   }
@@ -330,7 +455,7 @@ export function parseUserSpeech(
     };
   }
 
-  // 10. Check for Airtime Purchase across English, Twi, Fante, Ewe, Ga, Dagbani
+  // 10. Check for Airtime Purchase across all languages
   if (
     normalized.includes('airtime') ||
     normalized.includes('kadodo') ||
@@ -341,7 +466,10 @@ export function parseUserSpeech(
     normalized.includes('ƒle kadodo') ||
     normalized.includes('hé airtime') ||
     normalized.includes('daɣim airtime') ||
-    normalized.includes('daɣim salima')
+    normalized.includes('daɣim salima') ||
+    normalized.includes('katin waya') ||
+    normalized.includes('sayi katin') ||
+    normalized.includes('katin')
   ) {
     const amt = extractAmount(normalized) || (currentDraft?.serviceType === 'AIRTIME' ? currentDraft.amount : undefined) || 10;
     let targetPhone = detectedPhone;
@@ -389,7 +517,10 @@ export function parseUserSpeech(
     normalized.includes('xe fe') ||
     normalized.includes('wo nyɛmɔ') ||
     normalized.includes('yo samli') ||
-    normalized.includes('merchant')
+    normalized.includes('merchant') ||
+    normalized.includes('biyan kudi') ||
+    normalized.includes('biya kudi') ||
+    normalized.includes('biya')
   ) {
     const amt = extractAmount(normalized) || (currentDraft?.serviceType === 'BILL_PAY' ? currentDraft.amount : undefined) || 50;
     let biller = 'ECG (Electricity)';
@@ -423,7 +554,9 @@ export function parseUserSpeech(
     normalized.includes('yi sika') ||
     normalized.includes('ɖe ga') ||
     normalized.includes('tsi shika') ||
-    normalized.includes('yi laɣifu')
+    normalized.includes('yi laɣifu') ||
+    normalized.includes('cire kudi') ||
+    normalized.includes('cire')
   ) {
     const amt = extractAmount(normalized) || (currentDraft?.serviceType === 'CASH_OUT' ? currentDraft.amount : undefined) || 50;
     const fee = 0.5;
@@ -444,7 +577,7 @@ export function parseUserSpeech(
     };
   }
 
-  // 13. Transfer intent parsing (e.g. "Send 20 cedis to Ama", "Mene 20 kɔma Ama", "Ɖo cedi blaeve na Ama", or "Send 50 cedis to 0244123456")
+  // 13. Transfer intent parsing (e.g. "Send 20 cedis to Ama", "Mene 20 kɔma Ama", "Aika cedis ashirin zuwa Ama")
   if (
     normalized.includes('send') ||
     normalized.includes('transfer') ||
@@ -457,6 +590,8 @@ export function parseUserSpeech(
     normalized.includes('ɖo') ||
     normalized.includes('maje') ||
     normalized.includes('timi') ||
+    normalized.includes('aika') ||
+    normalized.includes('tura') ||
     detectedPhone ||
     currentDraft?.missingField
   ) {
@@ -469,10 +604,10 @@ export function parseUserSpeech(
     let finalRecipientNumber = matchedPhone || currentDraft?.recipientNumber;
     let finalMomoName = currentDraft?.momoAccountName;
 
-    if (matchedContact) {
+    if (matchedContact && !matchedPhone) {
       finalRecipientName = matchedContact.name;
-      finalRecipientNumber = matchedContact.number;
-      finalMomoName = matchedContact.verifiedName;
+      // Do not set recipientNumber here; step 5a will check contacts permission first
+      finalRecipientNumber = undefined;
     } else if (matchedPhone) {
       finalRecipientNumber = matchedPhone;
       finalMomoName = resolveMoMoAccountName(matchedPhone, finalRecipientName);
@@ -540,13 +675,13 @@ export function parseUserSpeech(
       extractedDraft: {
         serviceType: 'TRANSFER',
         recipientName: directContact.name,
-        recipientNumber: directContact.number,
-        momoAccountName: directContact.verifiedName,
+        recipientNumber: undefined,
+        momoAccountName: undefined,
         amount: currentDraft?.amount,
         currency: 'GHS',
         fee,
         total,
-        missingField: currentDraft?.amount ? null : 'amount',
+        missingField: 'recipientNumber',
       },
     };
   }
@@ -631,12 +766,12 @@ function matchContact(text: string): Contact | null {
 }
 
 function extractUnlistedRecipientName(text: string): string | null {
-  // Check patterns like: "to [Name]", "kɔma [Name]", "na [Name]", "maje [Name]"
-  const match = text.match(/(?:to|kɔma|na|maje|timi)\s+([a-zA-Z]{3,15})/i);
+  // Check patterns like: "to [Name]", "kɔma [Name]", "na [Name]", "maje [Name]", "zuwa [Name]", "wa [Name]"
+  const match = text.match(/(?:to|kɔma|na|maje|timi|zuwa|wa)\s+([a-zA-Z]{3,15})/i);
   if (match && match[1]) {
     const cand = match[1].toLowerCase();
     // Exclude common keywords
-    if (!['cedi', 'cedis', 'momo', 'phone', 'money', 'ghana', 'sika', 'ga'].includes(cand)) {
+    if (!['cedi', 'cedis', 'momo', 'phone', 'money', 'ghana', 'sika', 'ga', 'kudi'].includes(cand)) {
       return match[1].charAt(0).toUpperCase() + match[1].slice(1);
     }
   }
@@ -664,3 +799,80 @@ function extractAmount(text: string): number | null {
 
   return null;
 }
+
+/**
+ * Fast intent parser resolving simple answers locally in <3ms with no LLM call.
+ * Only calls Gemini Flash fallback if local rules return UNKNOWN.
+ */
+export async function parseUserSpeechFastAsync(
+  text: string,
+  currentDraft?: TransferDraft,
+  language: GhanaianLanguage = 'twi'
+): Promise<{ result: ParseResult; source: 'local_rules' | 'llm_fallback' }> {
+  // 1. Instant local rule resolution
+  const localResult = parseUserSpeech(text, currentDraft, language);
+  if (localResult.intent !== 'UNKNOWN') {
+    return { result: localResult, source: 'local_rules' };
+  }
+
+  // 2. Complex or ambiguous utterance: call fast Gemini Flash fallback
+  try {
+    const res = await fetch('/api/fast-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        context: {
+          draft: currentDraft,
+          language,
+        },
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.intent && data.intent !== 'UNKNOWN') {
+        let mappedIntent: IntentType = 'UNKNOWN';
+        if (data.intent === 'TRANSFER') mappedIntent = 'PREPARE_TRANSFER';
+        else if (data.intent === 'AIRTIME') mappedIntent = 'BUY_AIRTIME';
+        else if (data.intent === 'BILL') mappedIntent = 'PAY_BILL';
+        else if (data.intent === 'CASHOUT') mappedIntent = 'CASH_OUT';
+        else if (data.intent === 'BALANCE') mappedIntent = 'BALANCE_CHECK';
+        else if (data.intent === 'YES') mappedIntent = 'CONFIRM_TRANSFER';
+        else if (data.intent === 'NO') mappedIntent = 'ANSWER_NO';
+        else if (data.intent === 'CANCEL') mappedIntent = 'CANCEL';
+        else if (data.intent === 'REPEAT') mappedIntent = 'REPEAT';
+        else if (data.intent === 'SLOWER') mappedIntent = 'SLOWER';
+        else if (data.intent === 'FINGERPRINT') mappedIntent = 'CHOOSE_FINGERPRINT';
+        else if (data.intent === 'FACE') mappedIntent = 'CHOOSE_FACE';
+
+        if (mappedIntent !== 'UNKNOWN') {
+          return {
+            result: {
+              intent: mappedIntent,
+              confidence: 0.85,
+              rawText: text,
+              extractedDraft: data.amount
+                ? {
+                    serviceType: 'TRANSFER',
+                    amount: data.amount,
+                    currency: 'GHS',
+                    fee: calculateMoMoFee(data.amount),
+                    total: data.amount + calculateMoMoFee(data.amount),
+                    recipientNumber: data.phone || undefined,
+                    recipientName: data.recipient || undefined,
+                  }
+                : currentDraft,
+            },
+            source: 'llm_fallback',
+          };
+        }
+      }
+    }
+  } catch {
+    // LLM fallback failed, maintain local UNKNOWN
+  }
+
+  return { result: localResult, source: 'local_rules' };
+}
+

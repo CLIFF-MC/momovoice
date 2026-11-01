@@ -7,6 +7,9 @@ export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'ewe', name: 'Ewe', nativeName: 'Eʋegbe', region: 'Volta Region' },
   { code: 'ga', name: 'Ga', nativeName: 'Gã', region: 'Greater Accra' },
   { code: 'dagbani', name: 'Dagbani', nativeName: 'Dagbanli', region: 'Northern Region' },
+  { code: 'hausa', name: 'Hausa (Ghana)', nativeName: 'Harshen Hausa', region: 'National / Zongo' },
+  { code: 'krachi', name: 'Krachi (Kaakyi)', nativeName: 'Kaakyi', region: 'Oti Region (Dambai)' },
+  { code: 'buem', name: 'Buem (Lelemi)', nativeName: 'Lɛlɛmi (Buem)', region: 'Oti Region (Jasikan)' },
 ];
 
 export interface LanguagePhrases {
@@ -28,6 +31,31 @@ export interface LanguagePhrases {
   error: (msg: string) => string;
   help: string;
   repeat: string;
+  welcomeUser: (name: string) => string;
+  askWhatToDo: string;
+  biometricPrerequisite: string;
+  askRecipientTarget: string;
+  contactsPermissionPrePrompt: (name: string) => string;
+  contactsPermissionDenied: string;
+  contactNotFound: (name: string) => string;
+  contactMultipleFound: (name: string, listStr: string) => string;
+  confirmContactNumber: (name: string, phone: string) => string;
+  confirmSpokenNumber: (phone: string) => string;
+  registeredNameCrossCheck: (name: string) => string;
+  invalidRecipient: string;
+  quoteReview: (name: string, phone: string, amount: number, fee: number, total: number) => string;
+  biometricSensorGuide: (method: 'fingerprint' | 'face') => string;
+  anythingElse: string;
+  goodbye: string;
+  silenceReprompt: string;
+  silenceTimeout: string;
+  slowerNotice: string;
+  biometricNoHardware?: string;
+  biometricNotEnrolled?: string;
+  biometricAskChoice?: string;
+  biometricTestGuide?: (method: 'fingerprint' | 'face') => string;
+  biometricSetupSuccess?: (method: 'fingerprint' | 'face') => string;
+  biometricSetupFailed?: string;
   quickPrompts: { label: string; text: string }[];
 }
 
@@ -67,6 +95,28 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Transaction could not be completed. ${msg}. Your balance remains unchanged.`,
     help: 'You can say: "Send 20 cedis to Ama", "Buy 10 cedis airtime", "Pay ECG 50 cedis", "Cash out 50 cedis", "Check balance", or "Cancel".',
     repeat: 'Repeating last spoken instructions.',
+    welcomeUser: (name) => `Welcome, ${name}.`,
+    askWhatToDo: 'What would you like to do?',
+    biometricPrerequisite: "Before we send money, let's set up your fingerprint or face check.",
+    askRecipientTarget: 'Who do you want to send to? Say a name from your contacts, or say the number.',
+    contactsPermissionPrePrompt: (name) =>
+      `To find ${name}, I need to read your contacts. I can only read them, I can't change them. Your phone will ask permission now. Double-tap Allow.`,
+    contactsPermissionDenied: 'No problem. Please say the number instead.',
+    contactNotFound: (name) => `I couldn't find ${name} in your contacts. Please say the number.`,
+    contactMultipleFound: (name, listStr) => `I found multiple contacts for ${name}: ${listStr}. Which one do you want?`,
+    confirmContactNumber: (name, phone) => `I found ${name} with number ${phone}. Is this the right number?`,
+    confirmSpokenNumber: (phone) => `You said ${phone}. Is that right?`,
+    registeredNameCrossCheck: (name) => `This number is registered to ${name}. Is that right?`,
+    invalidRecipient: 'This number is not registered on MTN MoMo. Please say a valid recipient name or number.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `You are sending ${amt.toFixed(2)} Ghana cedis to ${name}, number ${phone}. Network fee is ${fee.toFixed(2)} cedis, total is ${total.toFixed(2)} cedis. Say yes to proceed, or say cancel.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Look at the camera to authorize.' : 'Place your finger on the sensor to authorize.',
+    anythingElse: 'Do you want to do anything else?',
+    goodbye: 'Goodbye. Thank you for using MTN MoMo.',
+    silenceReprompt: 'Are you still there? Please say your command, or say cancel.',
+    silenceTimeout: 'No response heard. Ending session safely to protect your account. Goodbye.',
+    slowerNotice: 'Speaking slower now.',
     quickPrompts: [
       { label: 'Airtime 10', text: 'Buy 10 cedis airtime' },
       { label: 'Send 20 to Ama', text: 'Send 20 cedis to Ama' },
@@ -109,6 +159,28 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Adwuma no antumi ankɔ. ${msg}. Wo sika gu so pɛpɛɛpɛ.`,
     help: 'Wobɛtumi aka: "Tɔ airtime cedis du", "Mene cedis aduonu kɔma Ama", "Tua ECG bill", "Gye sika", "Hwɛ me sika", anaa "Gyae".',
     repeat: 'Mesan ka asɛm no bio ma wo ate.',
+    welcomeUser: (name) => `Akwaaba, ${name}.`,
+    askWhatToDo: 'Dɛn na wopɛ sɛ woyɛ?',
+    biometricPrerequisite: "Ansa na yɛbɛmene sika no, ma yɛnsiesie wo nsateaa anaa woanim hwɛ.",
+    askRecipientTarget: 'Hwan na wopɛ sɛ womene sika kɔma no? Ka edin firi wo contacts mu, anaa ka nɔmba no.',
+    contactsPermissionPrePrompt: (name) =>
+      `Sɛ merekɔpɛ ${name} a, ehia sɛ mekenkan wo contacts. Metumi akenkan nko ara, mentumi nsesa hwee. Wo fon bɛbisa kwan seesei. Mia Allow so.`,
+    contactsPermissionDenied: 'Ɛnyɛ hwee. Yɛsrɛ wo ka nɔmba no mmom.',
+    contactNotFound: (name) => `Mannya ${name} wɔ wo contacts mu. Yɛsrɛ wo ka nɔmba no.`,
+    contactMultipleFound: (name, listStr) => `Manya contacts pii ma ${name}: ${listStr}. Hwan na wopɛ?`,
+    confirmContactNumber: (name, phone) => `Manya ${name} a ne nɔmba yɛ ${phone}. Saa nɔmba yi yɛ pɛ?`,
+    confirmSpokenNumber: (phone) => `Wo kae dɛ ${phone}. Ɛyɛ nokware?`,
+    registeredNameCrossCheck: (name) => `Saa nɔmba yi edin a ɛda so yɛ ${name}. Ɛyɛ nokware?`,
+    invalidRecipient: 'Saa nɔmba yi nyɛ pɛ wɔ MTN MoMo so. Yɛsrɛ wo ka din anaa nɔmba foforɔ.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Wode Ghana cedis ${amt.toFixed(2)} rekɔma ${name}, nɔmba ${phone}. MoMo ntoboa yɛ ${fee.toFixed(2)} cedis, ne nyinaa yɛ ${total.toFixed(2)} cedis. Ka aane sɛ wopene so, anaa gyae.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Hwɛ kamera no mu de agye atom.' : 'Fa wo nsateaa to sensor no so de agye atom.',
+    anythingElse: 'Wopɛ sɛ woyɛ biribi foforɔ bio?',
+    goodbye: 'Nante yie. Yɛda wo ase sɛ wowɔ MTN MoMo so.',
+    silenceReprompt: 'Wowɔ hɔ? Yɛsrɛ wo kasa, anaa ka dɛ gyae.',
+    silenceTimeout: 'Mante biribiara. Mereto adwuma no mu de abɔ wo kɔnta ho ban. Nante yie.',
+    slowerNotice: 'Merekasa brɛoo seesei.',
     quickPrompts: [
       { label: 'Tɔ Airtime 10', text: 'Tɔ airtime cedis du' },
       { label: 'Mene 20 kɔma Ama', text: 'Mene cedis aduonu kɔma Ama' },
@@ -151,6 +223,28 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Adwuma no antum annkɔ. ${msg}. Wo sika da ho hyɛŋŋ.`,
     help: 'Itum ka: "Tɔ airtime", "Mene cedis eduonu kɔma Ama", "Tua bill", "Hwɛ mo sika", anaa "Gyaa".',
     repeat: 'Morosan aka asɛm no bio ama etsie.',
+    welcomeUser: (name) => `Akwaaba, ${name}.`,
+    askWhatToDo: 'Ebɛn adze na epɛ dɛ eyɛ?',
+    biometricPrerequisite: "Ansaana yɛbɛmene sika no, ma yɛnsiesie wo nsateaa anaa w'enyiwa nhwɛmu.",
+    askRecipientTarget: 'Woana na epɛ dɛ emene sika kɔma no? Ka dzin efi wo contacts mu, anaa ka nɔmba no.',
+    contactsPermissionPrePrompt: (name) =>
+      `Sɛ morokɔhwehwɛ ${name} a, ɔwɔ dɛ mekan wo contacts. Motum akenkan nko ara, minntum nnsesa hwee. Wo fon bɛbisa kwan sesei. Mia Allow do.`,
+    contactsPermissionDenied: 'Hwee nnyi mu. Yɛserɛ wo ka nɔmba no mmom.',
+    contactNotFound: (name) => `Mannya ${name} wɔ wo contacts mu. Yɛserɛ wo ka nɔmba no.`,
+    contactMultipleFound: (name, listStr) => `Manya contacts pii ma ${name}: ${listStr}. Woana na epɛ?`,
+    confirmContactNumber: (name, phone) => `Manya ${name} a ne nɔmba yɛ ${phone}. Saa nɔmba yi yɛ pɛ?`,
+    confirmSpokenNumber: (phone) => `Ekaa dɛ ${phone}. Ɔyɛ nokwar?`,
+    registeredNameCrossCheck: (name) => `Saa nɔmba yi dzin a ɔda do pɛpɛɛpɛ nye ${name}. Ɔyɛ nokwar?`,
+    invalidRecipient: 'Saa nɔmba yi nnyɛ pɛ wɔ MTN MoMo do. Yɛserɛ wo ka dzin fofor anaa nɔmba fofor.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Erima Ghana cedis ${amt.toFixed(2)} akɔ ${name}, nɔmba ${phone}. MoMo kaw nye ${fee.toFixed(2)} cedis, ne nyinara nye ${total.toFixed(2)} cedis. Ka dɛ nyew sɛ epene do, anaa gyaa.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Hwɛ kamera no mu de agye do.' : 'Dze wo nsateaa to sensor do de agye do.',
+    anythingElse: 'Epɛ dɛ eyɛ biribi fofor bio?',
+    goodbye: 'Nante yie. Yɛda wo ase wɔ MTN MoMo nka mu.',
+    silenceReprompt: 'Ewɔ hɔ? Yɛserɛ wo kasa, anaa ka dɛ gyaa.',
+    silenceTimeout: 'Minntsiee biribiara. Moroto dwuma no mu ama wo kɔnta abɔ ban. Nante yie.',
+    slowerNotice: 'Morokasa brɛoo sesei.',
     quickPrompts: [
       { label: 'Tɔ Airtime 10', text: 'Tɔ airtime cedis du' },
       { label: 'Mene 20 kɔma Ama', text: 'Mene cedis eduonu kɔma Ama' },
@@ -193,6 +287,28 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Gadɔdɔ la mete ŋu dze edzi o. ${msg}. Wò ga le asiwò pɛpɛɛpɛ.`,
     help: 'Àte ŋu agblɔ: "Ƒle kadodo cedi ewo", "Ɖo cedi blaeve na Ama", "Xe ECG fe", "Kpɔ nye ga me", alo "Tɔe".',
     repeat: 'Megbugbɔ gbeɖiɖi la gblɔ na wò.',
+    welcomeUser: (name) => `Woezɔ, ${name}.`,
+    askWhatToDo: 'Nu kae nèdi be yeawo?',
+    biometricPrerequisite: 'Hafi míaɖo ga la, na míasɔ wò asibidɛ alo wò ŋkumekpɔkpɔ ɖo.',
+    askRecipientTarget: 'Ame kae nèdi be yeaɖo ga na? Gblɔ ŋkɔ le wò contacts me, alo gblɔ nɔmba la.',
+    contactsPermissionPrePrompt: (name) =>
+      `Be makpɔ ${name} la, ehiã be maxlẽ wò contacts. Mate ŋu axlẽe ko, nyemate ŋu atrɔ naneke o. Wò fɔŋ abia mɔ seesei. Mia Allow dzi zi eve.`,
+    contactsPermissionDenied: 'Nya aɖeke mele eme o. Taflatse gblɔ nɔmba la teƒe.',
+    contactNotFound: (name) => `Nyemekpɔ ${name} le wò contacts me o. Taflatse gblɔ nɔmba la.`,
+    contactMultipleFound: (name, listStr) => `Mekpɔ contacts gbogbo na ${name}: ${listStr}. Ka nèdi?`,
+    confirmContactNumber: (name, phone) => `Mekpɔ ${name} kple nɔmba ${phone}. Nɔmba sia sɔa?`,
+    confirmSpokenNumber: (phone) => `Ègblɔ be ${phone}. Ɛnyo pɛpɛɛpɛa?`,
+    registeredNameCrossCheck: (name) => `Nɔmba sia le ${name} ƒe ŋkɔ me. Ɛnyoa?`,
+    invalidRecipient: 'Nɔmba sia mele MTN MoMo dzi o. Taflatse gblɔ ŋkɔ alo nɔmba bubu.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Èle Ghana cedi ${amt.toFixed(2)} ɖom na ${name}, nɔmba ${phone}. MoMo fe nye ${fee.toFixed(2)} cedis, katã nye ${total.toFixed(2)} cedis. Gblɔ be Eẽ ne nèlɔ̃ ɖe edzi, alo gblɔ be Tɔe.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Kpɔ mɔ̃a ƒe kamera me be yealɔ̃ ɖe edzi.' : 'Tsɔ wò asibidɛ da ɖe mɔ̃a dzi be yealɔ̃ ɖe edzi.',
+    anythingElse: 'Èdi be yeawɔ nu bubu aɖea?',
+    goodbye: 'Hede nyuie. Míeda akpe na wò le MTN MoMo zaza ta.',
+    silenceReprompt: 'Ègale afima? Taflatse gblɔ nya, alo gblɔ be tɔe.',
+    silenceTimeout: 'Nyemese nya aɖeke o. Mele dɔa tɔm be mabɔ akɔnta ta. Hede nyuie.',
+    slowerNotice: 'Mele nu ƒom blewu azɔ.',
     quickPrompts: [
       { label: 'Ƒle kadodo 10', text: 'Ƒle kadodo cedi ewo' },
       { label: 'Ɖo 20 na Ama', text: 'Ɖo cedi blaeve na Ama' },
@@ -235,6 +351,28 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Gbɛjianɔtoo lɛ nya etsɛɛ. ${msg}. Oshika yɛ he ko he ko.`,
     help: 'Oobaanyɛ okɛɛ: "Hé airtime", "Kɛ cedi nyɔŋmai enyɔ maje Ama", "Wo ECG nyɛmɔ", "Kwɛmɔ mishika", aloo "Kpa".',
     repeat: 'Mikɛɛ nɔ ni mikɛɛ tsutsu lɛ ekoŋŋ.',
+    welcomeUser: (name) => `Atuu, ${name}.`,
+    askWhatToDo: 'Mɛni oosumɔ ni ofee?',
+    biometricPrerequisite: 'Dani wɔɔmaje shika lɛ, nyɛfea gbɛjianɔ kɛha oninɛbii aloo ohiɛ.',
+    askRecipientTarget: 'Namɔ oosumɔ ni okɛ shika amaje? Tsɛɔ gbɛi yɛ o-contacts mli, aloo ka nɔmba lɛ.',
+    contactsPermissionPrePrompt: (name) =>
+      `Koni matao ${name} lɛ, ehe miihia ni makane o-contacts. Matumi makane pɛ, minyɛɛɛ matsake nɔ ko. O-fon lɛ baabi hegbɛ amrɔ nɛɛ. Tswa Allow nɔ enyɔ.`,
+    contactsPermissionDenied: 'Nɔ ko bɛ mli. Ofainɛ ka nɔmba lɛ momo.',
+    contactNotFound: (name) => `Minaaa ${name} yɛ o-contacts amli. Ofainɛ ka nɔmba lɛ.`,
+    contactMultipleFound: (name, listStr) => `Mina contacts babaoo kɛha ${name}: ${listStr}. Te nɔ ni oosumɔ?`,
+    confirmContactNumber: (name, phone) => `Mina ${name} kɛ nɔmba ${phone}. Nɔmba nɛɛ ja?`,
+    confirmSpokenNumber: (phone) => `Okɛɛ akɛ ${phone}. Eja?`,
+    registeredNameCrossCheck: (name) => `Nɔmba nɛɛ gbɛi ni yɔɔ nɔ ji ${name}. Eja?`,
+    invalidRecipient: 'Nɔmba nɛɛ bɛ MTN MoMo nɔ. Ofainɛ ka gbɛi kroko aloo nɔmba kroko.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Okɛ Ghana cedi ${amt.toFixed(2)} yaaha ${name}, nɔmba ${phone}. MoMo hetoo ji ${fee.toFixed(2)} cedis, fɛɛ ji ${total.toFixed(2)} cedis. Kɛɛ Hɛɛ kɛji okpɛlɛ nɔ, aloo Kpa.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Kwɛmɔ mɔ̃a kamera lɛ mli de okpɛlɛ nɔ.' : 'Kɛ oninɛbii tswa sensor lɛ nɔ de okpɛlɛ nɔ.',
+    anythingElse: 'Oosumɔ ni ofee nɔ kroko bio?',
+    goodbye: 'Yaa jogbaŋŋ. Oyiwaladɔŋŋ kɛha MTN MoMo.',
+    silenceReprompt: 'Oyɛ jɛmɛ lolo? Ofainɛ wiemɔ, aloo kɛɛ kpa.',
+    silenceTimeout: 'Minuuu nɔ ko nɔ ko. Miitsĩ kɔntaa lɛ nya amrɔ nɛɛ. Yaa jogbaŋŋ.',
+    slowerNotice: 'Miibaanyɛ mawiemɔ bleoo amrɔ nɛɛ.',
     quickPrompts: [
       { label: 'Hé Airtime 10', text: 'Hé airtime cedi nyɔŋma' },
       { label: 'Maje 20 kɛha Ama', text: 'Kɛ cedi nyɔŋmai enyɔ maje Ama' },
@@ -277,11 +415,225 @@ export const GHANAIAN_LOCALIZATIONS: Record<GhanaianLanguage, LanguagePhrases> =
     error: (msg) => `Di bi too chaŋ. ${msg}. A laɣifu kpalim viɛnyɛla.`,
     help: 'A ni too yeli: "Daɣim airtime", "Timi Ama cedi pishi", "Yo ECG samli", "Nyama n laɣifu", bee "Chɛli".',
     repeat: 'N lahi labi yeli din gari maŋa.',
+    welcomeUser: (name) => `Ansaraŋba, ${name}.`,
+    askWhatToDo: 'Bo ka a bɔri ni a niŋ?',
+    biometricPrerequisite: 'Pɔi ka ti zaŋ laɣifu n-ti, maali a nuu bee a nina kpalinkpaa.',
+    askRecipientTarget: 'Ŋuni ka a bɔri ni a ti laɣifu? Bolim yuli din be a contacts puuni, bee bolim nɔmba maa.',
+    contactsPermissionPrePrompt: (name) =>
+      `Ni n-nya ${name}, di bɔrimi ni n-karim a contacts. N ni too karim pɛpɛɛpɛ, m ku too taɣi shɛli. A fon maa ni bɔhi soli pumpɔŋɔ. Kpɛhim Allow siɣim buyi.`,
+    contactsPermissionDenied: 'Yɛla bi gbaai. M-paɣa bolim nɔmba maa.',
+    contactNotFound: (name) => `M bi nya ${name} a contacts puuni. M-paɣa bolim nɔmba maa.`,
+    contactMultipleFound: (name, listStr) => `M nya contacts pam zaŋ kpa ${name}: ${listStr}. Dinli ka a bɔra?`,
+    confirmContactNumber: (name, phone) => `M nya ${name} ka o nɔmba nyɛ ${phone}. Nɔmba ŋɔ niŋ viɛnyɛla?`,
+    confirmSpokenNumber: (phone) => `A yeliya ni ${phone}. Di niŋ tabata?`,
+    registeredNameCrossCheck: (name) => `Salima nɔmba ŋɔ yuli kpalinkpaa nyɛla ${name}. Di niŋ tabata?`,
+    invalidRecipient: 'Salima nɔmba ŋɔ kani MTN MoMo zuɣu. Bolim yuli bee nɔmba palli.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `A ti Ghana cedi ${amt.toFixed(2)} n-ti ${name}, nɔmba ${phone}. MoMo laɣidiri nyɛla ${fee.toFixed(2)} cedis, zaa nyɛla ${total.toFixed(2)} cedis. Yelim Iyi ni a saɣi, bee Chɛli.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Lihi kamera maa ni a saɣi.' : 'Zaŋ a nuu kpɛhi sensor maa ni a saɣi.',
+    anythingElse: 'A bɔri ni a lahi niŋ shɛli?',
+    goodbye: 'Nante yie. Ti paɣiya ni a zaŋ MTN MoMo tum tuma.',
+    silenceReprompt: 'A na be nimaani? Yɛlima, bee yelim chɛli.',
+    silenceTimeout: 'M bi wum shɛli. N kpaŋsi laɣifu gbubirili pumpɔŋɔ. Nante yie.',
+    slowerNotice: 'N yɛri baŋkpoo pumpɔŋɔ.',
     quickPrompts: [
       { label: 'Daɣim Airtime 10', text: 'Daɣim airtime cedi pia' },
       { label: 'Timi 20 Ama', text: 'Timi Ama Ghana cedi pishi' },
       { label: 'Yo ECG 50', text: 'Yo ECG samli cedi pihinu' },
       { label: 'Nyama n laɣifu', text: 'Nyama n laɣifu' },
+    ],
+  },
+  hausa: {
+    welcome: 'Barka da zuwa MTN MoMo. Za ka iya cewa: "Sayi katin waya cedis goma", "Aika kudi cedis ashirin zuwa Ama", "Biya kudin ECG cedis hamsin", "Cire kudi cedis hamsin", ko "Duba kudi na".',
+    balance: (amt) => `Kudin ka da ke cikin MTN MoMo asusun ka shine Ghana cedis ${amt.toFixed(2)}.`,
+    askRecipient: (amt) =>
+      amt
+        ? `Wa kake so ka aika wa Ghana cedis ${amt}? Za ka iya fadi sunan mutum ko lambar wayarsa.`
+        : 'Wa kake so ka aika wa kudi? Fadi sunan sa ko lambar wayarsa.',
+    askPhoneNumber: (name) =>
+      name
+        ? `Menene lambar wayar ${name}? Fadi lambobi goman kamar "0244123456".`
+        : 'Don Allah fadi lambar wayar MoMo goman.',
+    askAmount: (rec) =>
+      rec ? `Cedis nawa kake so ka tura wa ${rec}?` : 'Ghana cedis nawa kake so ka aika?',
+    review: (momoName, phone, amt, fee, total) =>
+      `Don Allah saurara da kyau: Kana tura Ghana cedis ${amt.toFixed(2)} zuwa lambar waya ${phone}. Sunan da ke rajista a MTN MoMo shine ${momoName}. Kudin aikawa shine cedis ${fee.toFixed(2)}, jimilla shine cedis ${total.toFixed(2)}. Ka ce "Eh" don amincewa da yatsanka, ko ka ce "A'a".`,
+    airtimeReview: (phone, amt) =>
+      `Don Allah tabbatar: Kana sayen katin waya na Ghana cedis ${amt.toFixed(2)} don lambar ${phone}. Babu kudin karba. Ka ce "Eh" don amincewa da yatsanka, ko "A'a".`,
+    airtimeSuccess: (phone, amt, ref, bal) =>
+      `Sayen katin waya ya yi nasara! An tura cedis ${amt.toFixed(2)} katin waya zuwa ${phone}. Ragowar kudin ka shine cedis ${bal.toFixed(2)}.`,
+    billReview: (biller, amt) =>
+      `Don Allah tabbatar: Kana biyan Ghana cedis ${amt.toFixed(2)} zuwa ${biller}. Ka ce "Eh" don amincewa da yatsanka, ko "A'a".`,
+    billSuccess: (biller, amt, ref, bal) =>
+      `Biyan kudin ${biller} ya yi nasara! Cedis ${amt.toFixed(2)} ya tafi. Ragowar kudin ka shine cedis ${bal.toFixed(2)}.`,
+    cashOutReview: (agent, amt, fee, total) =>
+      `Don Allah tabbatar: Kana cire Ghana cedis ${amt.toFixed(2)} a wajen wakili ${agent}. Kudin cirewa shine cedis ${fee.toFixed(2)}, jimilla shine cedis ${total.toFixed(2)}. Ka ce "Eh" don amincewa.`,
+    cashOutSuccess: (agent, amt, ref, bal) =>
+      `Cire kudi ya yi nasara! Cedis ${amt.toFixed(2)} daga wakili ${agent}. Ragowar kudin ka shine cedis ${bal.toFixed(2)}.`,
+    biometricPrompt: (momoName, total) =>
+      `Danna yatsanka a kan na'urar don tabbatar da tura cedis ${total.toFixed(2)} zuwa ${momoName}. Ba a fadin lambar PIN a fili.`,
+    success: (rec, amt, ref, bal) =>
+      `Kudin ka ya tafi lafiya! Ka aika Ghana cedis ${amt.toFixed(2)} zuwa ${rec}. Lambar shaida ${ref.slice(0, 8)}. Ragowar kudin ka shine cedis ${bal.toFixed(2)}.`,
+    cancel: 'An soke aikin. Babu kudi da aka cire daga asusun ka.',
+    error: (msg) => `Aikin bai samu nasara ba. ${msg}. Kudin ka yana nan lafiya.`,
+    help: 'Za ka iya cewa: "Sayi katin waya cedis goma", "Aika kudi cedis ashirin zuwa Ama", "Biya kudin ECG", "Cire kudi", "Duba kudi na", ko "Soke".',
+    repeat: 'Ina sake maimaita bayanin karshe.',
+    welcomeUser: (name) => `Barka da zuwa, ${name}.`,
+    askWhatToDo: 'Menene kake so ka yi?',
+    biometricPrerequisite: 'Kafin mu aika kudi, bari mu saita yatsanka ko fuskarka.',
+    askRecipientTarget: 'Wa kake so ka aika wa kudi? Fadi suna daga contacts dinka, ko ka fadi lambar waya.',
+    contactsPermissionPrePrompt: (name) =>
+      `Don nemo ${name}, ina bukatar duba contacts dinka. Zan iya karantawa kawai, ba zan iya canzawa ba. Wayarka za ta nemi izini yanzu. Danna Allow sau biyu.`,
+    contactsPermissionDenied: 'Babu matsala. Don Allah fadi lambar wayar kawai.',
+    contactNotFound: (name) => `Ban sami ${name} a cikin contacts dinka ba. Don Allah fadi lambar wayar.`,
+    contactMultipleFound: (name, listStr) => `Na sami contacts da dama na ${name}: ${listStr}. Wanne kake so?`,
+    confirmContactNumber: (name, phone) => `Na sami ${name} tare da lambar waya ${phone}. Wannan lambar daidai ce?`,
+    confirmSpokenNumber: (phone) => `Ka ce ${phone}. Hakan daidai ne?`,
+    registeredNameCrossCheck: (name) => `Wannan lambar tana da rijista da sunan ${name}. Hakan daidai ne?`,
+    invalidRecipient: 'Wannan lambar ba ta da rijista a MTN MoMo. Don Allah fadi sabon suna ko lamba.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Kana tura Ghana cedis ${amt.toFixed(2)} zuwa ${name}, lambar ${phone}. Kudin aikawa shine ${fee.toFixed(2)} cedis, jimilla ${total.toFixed(2)} cedis. Ka ce Eh idan ka amince, ko Soke.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Kalli kyamara don tabbatarwa.' : 'Sanya yatsanka a kan naurar don tabbatarwa.',
+    anythingElse: 'Kana so ka yi wani abu kuma?',
+    goodbye: 'Sai an jima. Mungode da amfani da MTN MoMo.',
+    silenceReprompt: 'Kuna nan? Don Allah fadi magana, ko ka ce soke.',
+    silenceTimeout: 'Ban ji komai ba. Ina rufe asusun don tsaro. Sai an jima.',
+    slowerNotice: 'Ina magana a hankali yanzu.',
+    quickPrompts: [
+      { label: 'Sayi Katin 10', text: 'Sayi katin waya cedis goma' },
+      { label: 'Tura 20 ga Ama', text: 'Aika kudi cedis ashirin zuwa Ama' },
+      { label: 'Biya ECG 50', text: 'Biya kudin ECG cedis hamsin' },
+      { label: 'Duba Kudi', text: 'Duba kudi na' },
+    ],
+  },
+  krachi: {
+    welcome: 'Mo ba MTN MoMo nka mu. Fɔ bɛtɔmi bɛka dɛ: "Tɔ airtime cedis idu", "Mene cedis aduɔnyɔ kɔma Ama", "Tua ECG bill cedis aduɔnoo", "Gye sika cedis aduɔnoo", anaa "Kere me sika".',
+    balance: (amt) => `Wo MTN MoMo sika a wɔ kɔnta mu yɛ Ghana cedis ${amt.toFixed(2)}.`,
+    askRecipient: (amt) =>
+      amt
+        ? `Wanyi na fɔ pɛ dɛ fɔ mene Ghana cedis ${amt} kɔma mɔ? Fɔ bɛtɔmi bɛka mɔ yin anaa mɔ fon nɔmba.`
+        : 'Wanyi na fɔ pɛ dɛ fɔ mene sika kɔma mɔ? Ka mɔ yin anaa mɔ fon nɔmba.',
+    askPhoneNumber: (name) =>
+      name
+        ? `${name} fon nɔmba yɛ ahe? Ka nɔmba idu no.`
+        : 'Yɛsrɛ fɔ ka MoMo fon nɔmba idu no.',
+    askAmount: (rec) =>
+      rec ? `Sika ahe na fɔ pɛ dɛ fɔ mene kɔma ${rec}?` : 'Ghana cedis ahe na fɔ pɛ dɛ fɔ mene?',
+    review: (momoName, phone, amt, fee, total) =>
+      `Tsie yie: Fɔ de Ghana cedis ${amt.toFixed(2)} rekɔma fon nɔmba ${phone}. Ne MTN MoMo yin a ɛda do yɛ ${momoName}. MoMo ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis. Ka dɛ "Ee" na fa fɔ nsateaa to afidie no do, anaa ka dɛ "Gyaa".`,
+    airtimeReview: (phone, amt) =>
+      `Tsie yie: Fɔ retɔ Ghana cedis ${amt.toFixed(2)} airtime ama fon ${phone}. Ntoboa biara nni ho. Ka dɛ "Ee" na fa nsateaa to do.`,
+    airtimeSuccess: (phone, amt, ref, bal) =>
+      `Fɔ atɔ airtime no pɛpɛɛpɛ! Ghana cedis ${amt.toFixed(2)} airtime akɔ fon ${phone} do. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    billReview: (biller, amt) =>
+      `Tsie yie: Fɔ retua Ghana cedis ${amt.toFixed(2)} ama ${biller}. Ka dɛ "Ee" na fa nsateaa to do.`,
+    billSuccess: (biller, amt, ref, bal) =>
+      `Fɔ atua ${biller} bill no pɛpɛɛpɛ! Cedis ${amt.toFixed(2)} akɔ. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    cashOutReview: (agent, amt, fee, total) =>
+      `Tsie yie: Fɔ regye Ghana cedis ${amt.toFixed(2)} afiri agent ${agent} nkyɛn. Ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis.`,
+    cashOutSuccess: (agent, amt, ref, bal) =>
+      `Fɔ agye sika no pɛpɛɛpɛ! Cedis ${amt.toFixed(2)} afiri agent ${agent}. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    biometricPrompt: (momoName, total) =>
+      `Fa fɔ nsateaa to afidie no do de agye cedis ${total.toFixed(2)} a fɔ rekɔma ${momoName} no atom. MoMo PIN biara renka bagua mu.`,
+    success: (rec, amt, ref, bal) =>
+      `Wo sika no akɔ pɛpɛɛpɛ! Fɔ amene Ghana cedis ${amt.toFixed(2)} akɔma ${rec}. Reference nɔmba yɛ ${ref.slice(0, 8)}. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    cancel: 'Yatwa adwuma no mu. Sika biara mfiri wo kɔnta mu.',
+    error: (msg) => `Adwuma no antumi ankɔ. ${msg}. Wo sika wɔ kɔnta mu pɛpɛɛpɛ.`,
+    help: 'Fɔ bɛtɔmi bɛka: "Tɔ airtime cedis idu", "Mene cedis aduɔnyɔ kɔma Ama", "Tua ECG bill", "Gye sika", "Kere me sika", anaa "Gyaa".',
+    repeat: 'Mesan ka asɛm no bio ma fɔ ate.',
+    welcomeUser: (name) => `Mo ba, ${name}.`,
+    askWhatToDo: 'Kɛbɛ na fɔ pɛ dɛ fɔ yo?',
+    biometricPrerequisite: 'Ansa na yɛbɛmene sika no, ma yɛnsiesie fɔ nsateaa anaa fɔ anim.',
+    askRecipientTarget: 'Wanyi na fɔ pɛ dɛ fɔ mene sika kɔma mɔ? Ka yin firi fɔ contacts mu, anaa ka nɔmba no.',
+    contactsPermissionPrePrompt: (name) =>
+      `Sɛ merekɔpɛ ${name} a, ehia dɛ mekenkan fɔ contacts. Metɔmi akenkan pɛ, mentɔmi nsesa kɛkɛɛ. Fɔ fon bɛbisa kwan siesie. Mia Allow do siɔnyɔ.`,
+    contactsPermissionDenied: 'Hwee nni ho. Yɛsrɛ fɔ ka nɔmba no kɛkɛ.',
+    contactNotFound: (name) => `Mannya ${name} wɔ fɔ contacts mu. Yɛsrɛ fɔ ka nɔmba no.`,
+    contactMultipleFound: (name, listStr) => `Manya contacts dodo ma ${name}: ${listStr}. Wanyi na fɔ pɛ?`,
+    confirmContactNumber: (name, phone) => `Manya ${name} a ne nɔmba yɛ ${phone}. Saa nɔmba yi yɛ pɛ?`,
+    confirmSpokenNumber: (phone) => `Fɔ kae dɛ ${phone}. Ɛyɛ nokware?`,
+    registeredNameCrossCheck: (name) => `Saa nɔmba yi yin a ɛda do yɛ ${name}. Ɛyɛ nokware?`,
+    invalidRecipient: 'Saa nɔmba yi nni MTN MoMo do. Yɛsrɛ fɔ ka yin anaa nɔmba foforɔ.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Fɔ de Ghana cedis ${amt.toFixed(2)} rekɔma ${name}, nɔmba ${phone}. MoMo ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis. Ka dɛ Ee sɛ fɔ pene do, anaa Gyaa.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Hwɛ kamera no mu de agye atom.' : 'Fa fɔ nsateaa to sensor no do de agye atom.',
+    anythingElse: 'Fɔ pɛ dɛ fɔ yo biribi foforɔ bio?',
+    goodbye: 'Nante yie. Yɛda fɔ ase wɔ MTN MoMo nka mu.',
+    silenceReprompt: 'Fɔ wɔ do? Yɛsrɛ fɔ kasa, anaa ka dɛ gyaa.',
+    silenceTimeout: 'Mante biribiara. Mereto adwuma no mu de abɔ fɔ kɔnta ho ban. Nante yie.',
+    slowerNotice: 'Merekasa brɛoo siesie.',
+    quickPrompts: [
+      { label: 'Tɔ Airtime 10', text: 'Tɔ airtime cedis idu' },
+      { label: 'Mene 20 kɔma Ama', text: 'Mene cedis aduɔnyɔ kɔma Ama' },
+      { label: 'Tua ECG 50', text: 'Tua ECG bill cedis aduɔnoo' },
+      { label: 'Kere me sika', text: 'Kere me sika' },
+    ],
+  },
+  buem: {
+    welcome: 'Mo ba MTN MoMo nka mu. Fɔ bɛtɔmi bɛka dɛ: "Tɔ airtime cedis lefu", "Mene cedis aduɔnyɔ kɔma Ama", "Tua ECG bill cedis aduɔnɔ", "Gye sika cedis aduɔnɔ", anaa "Kere me sika".',
+    balance: (amt) => `Wo MTN MoMo sika a ɛwɔ kɔnta mu yɛ Ghana cedis ${amt.toFixed(2)}.`,
+    askRecipient: (amt) =>
+      amt
+        ? `Wanyi na fɔ pɛ dɛ fɔ mene Ghana cedis ${amt} kɔma mɔ? Fɔ bɛtɔmi bɛka mɔ yin anaa mɔ fon nɔmba.`
+        : 'Wanyi na fɔ pɛ dɛ fɔ mene sika kɔma mɔ? Ka mɔ yin anaa mɔ fon nɔmba.',
+    askPhoneNumber: (name) =>
+      name
+        ? `${name} fon nɔmba yɛ ahe? Ka nɔmba lefu no.`
+        : 'Yɛsrɛ fɔ ka MoMo fon nɔmba lefu no.',
+    askAmount: (rec) =>
+      rec ? `Sika ahe na fɔ pɛ dɛ fɔ mene kɔma ${rec}?` : 'Ghana cedis ahe na fɔ pɛ dɛ fɔ mene?',
+    review: (momoName, phone, amt, fee, total) =>
+      `Tsie yie: Fɔ de Ghana cedis ${amt.toFixed(2)} rekɔma fon nɔmba ${phone}. Ne MTN MoMo yin a ɛda do yɛ ${momoName}. MoMo ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis. Ka dɛ "Ee" na fa fɔ nsateaa to afidie no do, anaa ka dɛ "Gyaa".`,
+    airtimeReview: (phone, amt) =>
+      `Tsie yie: Fɔ retɔ Ghana cedis ${amt.toFixed(2)} airtime ama fon ${phone}. Ntoboa biara nni ho. Ka dɛ "Ee" na fa nsateaa to do.`,
+    airtimeSuccess: (phone, amt, ref, bal) =>
+      `Fɔ atɔ airtime no pɛpɛɛpɛ! Ghana cedis ${amt.toFixed(2)} airtime akɔ fon ${phone} do. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    billReview: (biller, amt) =>
+      `Tsie yie: Fɔ retua Ghana cedis ${amt.toFixed(2)} ama ${biller}. Ka dɛ "Ee" na fa nsateaa to do.`,
+    billSuccess: (biller, amt, ref, bal) =>
+      `Fɔ atua ${biller} bill no pɛpɛɛpɛ! Cedis ${amt.toFixed(2)} akɔ. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    cashOutReview: (agent, amt, fee, total) =>
+      `Tsie yie: Fɔ regye Ghana cedis ${amt.toFixed(2)} afiri agent ${agent} nkyɛn. Ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis.`,
+    cashOutSuccess: (agent, amt, ref, bal) =>
+      `Fɔ agye sika no pɛpɛɛpɛ! Cedis ${amt.toFixed(2)} afiri agent ${agent}. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    biometricPrompt: (momoName, total) =>
+      `Fa fɔ nsateaa to afidie no do de agye cedis ${total.toFixed(2)} a fɔ rekɔma ${momoName} no atom. MoMo PIN biara renka bagua mu.`,
+    success: (rec, amt, ref, bal) =>
+      `Wo sika no akɔ pɛpɛɛpɛ! Fɔ amene Ghana cedis ${amt.toFixed(2)} akɔma ${rec}. Reference nɔmba yɛ ${ref.slice(0, 8)}. Sika a aka yɛ cedis ${bal.toFixed(2)}.`,
+    cancel: 'Yatwa adwuma no mu. Sika biara mfiri wo kɔnta mu.',
+    error: (msg) => `Adwuma no antumi ankɔ. ${msg}. Wo sika wɔ kɔnta mu pɛpɛɛpɛ.`,
+    help: 'Fɔ bɛtɔmi bɛka: "Tɔ airtime cedis lefu", "Mene cedis aduɔnyɔ kɔma Ama", "Tua ECG bill", "Gye sika", "Kere me sika", anaa "Gyaa".',
+    repeat: 'Mesan ka asɛm no bio ma fɔ ate.',
+    welcomeUser: (name) => `Mo ba, ${name}.`,
+    askWhatToDo: 'Kɛbɛ na fɔ pɛ dɛ fɔ yo?',
+    biometricPrerequisite: 'Ansa na yɛbɛmene sika no, ma yɛnsiesie fɔ nsateaa anaa fɔ anim.',
+    askRecipientTarget: 'Wanyi na fɔ pɛ dɛ fɔ mene sika kɔma mɔ? Ka yin firi fɔ contacts mu, anaa ka nɔmba no.',
+    contactsPermissionPrePrompt: (name) =>
+      `Sɛ merekɔpɛ ${name} a, ehia dɛ mekenkan fɔ contacts. Metɔmi akenkan pɛ, mentɔmi nsesa kɛkɛɛ. Fɔ fon bɛbisa kwan siesie. Mia Allow do siɔnyɔ.`,
+    contactsPermissionDenied: 'Hwee nni ho. Yɛsrɛ fɔ ka nɔmba no kɛkɛ.',
+    contactNotFound: (name) => `Mannya ${name} wɔ fɔ contacts mu. Yɛsrɛ fɔ ka nɔmba no.`,
+    contactMultipleFound: (name, listStr) => `Manya contacts dodo ma ${name}: ${listStr}. Wanyi na fɔ pɛ?`,
+    confirmContactNumber: (name, phone) => `Manya ${name} a ne nɔmba yɛ ${phone}. Saa nɔmba yi yɛ pɛ?`,
+    confirmSpokenNumber: (phone) => `Fɔ kae dɛ ${phone}. Ɛyɛ nokware?`,
+    registeredNameCrossCheck: (name) => `Saa nɔmba yi yin a ɛda do yɛ ${name}. Ɛyɛ nokware?`,
+    invalidRecipient: 'Saa nɔmba yi nni MTN MoMo do. Yɛsrɛ fɔ ka yin anaa nɔmba foforɔ.',
+    quoteReview: (name, phone, amt, fee, total) =>
+      `Fɔ de Ghana cedis ${amt.toFixed(2)} rekɔma ${name}, nɔmba ${phone}. MoMo ntoboa yɛ ${fee.toFixed(2)} cedis, ne pɛpɛɛpɛ yɛ ${total.toFixed(2)} cedis. Ka dɛ Ee sɛ fɔ pene do, anaa Gyaa.`,
+    biometricSensorGuide: (method) =>
+      method === 'face' ? 'Hwɛ kamera no mu de agye atom.' : 'Fa fɔ nsateaa to sensor no do de agye atom.',
+    anythingElse: 'Fɔ pɛ dɛ fɔ yo biribi foforɔ bio?',
+    goodbye: 'Nante yie. Yɛda fɔ ase wɔ MTN MoMo nka mu.',
+    silenceReprompt: 'Fɔ wɔ do? Yɛsrɛ fɔ kasa, anaa ka dɛ gyaa.',
+    silenceTimeout: 'Mante biribiara. Mereto adwuma no mu de abɔ fɔ kɔnta ho ban. Nante yie.',
+    slowerNotice: 'Merekasa brɛoo siesie.',
+    quickPrompts: [
+      { label: 'Tɔ Airtime 10', text: 'Tɔ airtime cedis lefu' },
+      { label: 'Mene 20 kɔma Ama', text: 'Mene cedis aduɔnyɔ kɔma Ama' },
+      { label: 'Tua ECG 50', text: 'Tua ECG bill cedis aduɔnɔ' },
+      { label: 'Kere me sika', text: 'Kere me sika' },
     ],
   },
 };
@@ -369,4 +721,114 @@ export const GHANAIAN_NUMBER_WORDS: Record<string, number> = {
   pihita: 30,
   pihinu: 50,
   kɔbiga: 100,
+
+  // Hausa
+  daya: 1,
+  biyu: 2,
+  uku: 3,
+  hudu: 4,
+  biyar: 5,
+  shida: 6,
+  bakwai: 7,
+  takwas: 8,
+  tara: 9,
+  goma: 10,
+  ashirin: 20,
+  talatin: 30,
+  arba_in: 40,
+  hamsin: 50,
+  dari: 100,
+
+  // Krachi (Kaakyi - Oti Region)
+  koo: 1,
+  anyɔ: 2,
+  asa: 3,
+  anaa: 4,
+  anoo: 5,
+  asiee: 6,
+  asono: 7,
+  akwee: 8,
+  akpuno: 9,
+  idu: 10,
+  kudo: 10,
+  aduɔnyɔ: 20,
+  aduɔsa: 30,
+  aduɔnoo: 50,
+  kɛlaŋ: 100,
+
+  // Buem (Lɛlɛmi - Oti Region)
+  kuko: 1,
+  anɔ: 5,
+  asie: 6,
+  asunɔ: 7,
+  anyani: 8,
+  anyana: 9,
+  lefu: 10,
+  aduɔnɔ: 50,
+  kuha: 100,
 };
+
+export function getBiometricPhrases(lang: GhanaianLanguage) {
+  const p = GHANAIAN_LOCALIZATIONS[lang] || GHANAIAN_LOCALIZATIONS.en;
+  return {
+    noHardware:
+      p.biometricNoHardware ||
+      (lang === 'twi' || lang === 'fante'
+        ? 'Wo fon no nni nsateaa anaa anim afidie. Sika amene hia nsateaa anaa anim check.'
+        : lang === 'ewe'
+        ? 'Wò ka mele asibidɛ alo mo mɔ̃ o. Ɖe ga bia asibidɛ alo mo dodokpɔ.'
+        : lang === 'hausa'
+        ? 'Wayarka ba ta da naurar yatsa ko fuska. Ana buƙatar yatsa ko fuska don tura kuɗi.'
+        : 'Your phone does not have biometric hardware. This feature requires a fingerprint or face unlock.'),
+    notEnrolled:
+      p.biometricNotEnrolled ||
+      (lang === 'twi' || lang === 'fante'
+        ? "Wo fon nni nsateaa anaa anim biara a wɔakora so. Mɛbue wo fon settings ama woatumi de bi aka ho, na afei woasan aba."
+        : lang === 'ewe'
+        ? "Wò ka mekpɔ da asibidɛ alo mo aɖeke ɖi o. Maʋu wò ka ƒe settings be naɖoe, eyome nàtrɔ ava."
+        : lang === 'hausa'
+        ? "Wayarka ba ta da yatsa ko fuska da aka ajiye. Zan buɗe saitunan wayarka don ka saka, sannan ka dawo."
+        : "Your phone has no fingerprint or face saved yet. I'll open your phone settings so you can add one, then come back."),
+    askChoice:
+      p.biometricAskChoice ||
+      (lang === 'twi' || lang === 'fante'
+        ? 'Wopɛ sɛ wode nsateaa anaa anim yɛ adwuma?'
+        : lang === 'ewe'
+        ? 'Èdi be yeawe dɔ kple asibidɛ alo mo?'
+        : lang === 'hausa'
+        ? 'Kuna son amfani da yatsa ko fuska?'
+        : 'Do you want to use fingerprint or face?'),
+    testGuide: (method: 'fingerprint' | 'face') =>
+      p.biometricTestGuide
+        ? p.biometricTestGuide(method)
+        : method === 'face'
+        ? (lang === 'twi' || lang === 'fante'
+            ? 'Hwɛ kamera no mu.'
+            : lang === 'ewe'
+            ? 'Kpɔ kamera la me.'
+            : lang === 'hausa'
+            ? 'Kalli kyamarar.'
+            : 'Look at the camera.')
+        : (lang === 'twi' || lang === 'fante'
+            ? 'Fa wo nsateaa si sensor no so.'
+            : lang === 'ewe'
+            ? 'Da wò asibidɛ ɖe sensor la dzi.'
+            : lang === 'hausa'
+            ? 'Sanya yatsanka a kan naurar.'
+            : 'Place your finger on the sensor.'),
+    setupSuccess: (method: 'fingerprint' | 'face') =>
+      p.biometricSetupSuccess
+        ? p.biometricSetupSuccess(method)
+        : `${method === 'face' ? 'Face check' : 'Fingerprint'} is set up successfully. What would you like to do?`,
+    setupFailed:
+      p.biometricSetupFailed ||
+      (lang === 'twi' || lang === 'fante'
+        ? 'Biometric check no annyɛ yie. Wopɛ sɛ wosɔ hwɛ bio?'
+        : lang === 'ewe'
+        ? 'Biometric dodokpɔ medze edzi o. Èdi be yeagate kpɔa?'
+        : lang === 'hausa'
+        ? 'Tabbatar da yatsa ko fuska bai yi nasara ba. Kuna son sake gwadawa?'
+        : 'Biometric verification was not recognized. Would you like to try again?'),
+  };
+}
+

@@ -38,6 +38,13 @@ export const FREQUENT_CONTACTS: Contact[] = [
     verifiedName: 'Akua Boateng',
     relationship: 'Colleague',
   },
+  {
+    id: 'c5',
+    name: 'Ama',
+    number: '0244889900',
+    verifiedName: 'Ama Osei',
+    relationship: 'Friend',
+  },
 ];
 
 export const INITIAL_TRANSACTIONS: TransactionRecord[] = [
@@ -102,3 +109,15 @@ export function calculateMoMoFee(amount: number): number {
   if (amount <= 1000) return Number((amount * 0.0075).toFixed(2));
   return 7.5; // Capped at GHS 7.50
 }
+
+export function resolveMoMoAccountName(phone: string, fallbackName?: string): string {
+  const clean = phone.replace(/\D/g, '');
+  const match = FREQUENT_CONTACTS.find((c) => c.number.replace(/\D/g, '') === clean);
+  if (match) return match.verifiedName;
+  if (fallbackName && fallbackName !== 'Ama') return fallbackName;
+  const lastDigits = clean.slice(-2);
+  const sampleNames = ['Kwabena Frimpong', 'Esi Sutherland', 'Yaw Mensah', 'Afia Poku', 'Kofi Boateng', 'Serwaa Akoto'];
+  const index = parseInt(lastDigits || '0', 10) % sampleNames.length;
+  return sampleNames[index];
+}
+

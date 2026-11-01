@@ -171,8 +171,29 @@ class VoiceService {
     }
   }
 
+  private isSpeakingState = false;
+  private audioMeterStream: MediaStream | null = null;
+  private audioMeterInterval: any = null;
+  private audioLevelListeners: Array<(level: number) => void> = [];
+
+  public getIsSpeaking(): boolean {
+    return this.isSpeakingState;
+  }
+
+  public getIsListening(): boolean {
+    return this.isListening;
+  }
+
+  public onAudioLevel(listener: (level: number) => void) {
+    this.audioLevelListeners.push(listener);
+    return () => {
+      this.audioLevelListeners = this.audioLevelListeners.filter((l) => l !== listener);
+    };
+  }
+
   /**
-   * Speaks text using Natural Human Gemini TTS first, falling back to tuned client synthesis
+   * Speaks text using Natural Human Gemini TTS first, falling back to tuned client synthesis.
+   * Ensures microphone is stopped before speaking and releases lock when done.
    */
   public async speak(
     text: string,
@@ -192,9 +213,16 @@ class VoiceService {
       return;
     }
 
-    if (options?.interrupt !== false) {
-      this.stopSpeaking();
-    }
+    // Never allow microphone to listen while speaking (prevents acoustic feedback)
+    this.stopListening();
+    this.stopSpeaking();
+    this.isSpeakingState = true;
+
+    const wrappedOnEnd = () => {
+      this.isSpeakingState = false;
+      this.currentAudio = null;
+      options?.onEnd?.();
+    };
 
     // Attempt 1: Call server Gemini TTS for rich natural West African human voice
     try {
@@ -216,17 +244,16 @@ class VoiceService {
 
           return new Promise((resolve) => {
             audio.onended = () => {
-              this.currentAudio = null;
-              options?.onEnd?.();
+              wrappedOnEnd();
               resolve();
             };
             audio.onerror = () => {
               this.currentAudio = null;
               // Fall back to client synthesis
-              this.speakWithClientSynth(text, options).then(resolve);
+              this.speakWithClientSynth(text, { priority, onEnd: wrappedOnEnd }).then(resolve);
             };
             audio.play().catch(() => {
-              this.speakWithClientSynth(text, options).then(resolve);
+              this.speakWithClientSynth(text, { priority, onEnd: wrappedOnEnd }).then(resolve);
             });
           });
         }
@@ -236,7 +263,7 @@ class VoiceService {
     }
 
     // Attempt 2: Fallback to tuned client-side speech synthesis
-    return this.speakWithClientSynth(text, options);
+    return this.speakWithClientSynth(text, { priority, onEnd: wrappedOnEnd });
   }
 
   private speakWithClientSynth(
@@ -296,6 +323,7 @@ class VoiceService {
   }
 
   public stopSpeaking() {
+    this.isSpeakingState = false;
     if (this.currentAudio) {
       try {
         this.currentAudio.pause();
@@ -314,13 +342,25 @@ class VoiceService {
     return Boolean(this.recognition);
   }
 
-  public startListening(
-    onResult: (transcript: string) => void,
-    onError: (error: string) => void,
-    onEnd: () => void
-  ) {
+  /**
+   * Hands-free listening with Voice Activity Detection (VAD) / ~1s silence detection.
+   * Auto-stops ~1000ms after speech ends and emits speechEndMs timestamp for timing logs.
+   */
+  public startHandsFreeListening(callbacks: {
+    onResult: (transcript: string, timings: { speechEndMs: number; transcriptReceivedMs: number }) => void;
+    onSilence: () => void;
+    onError: (error: string) => void;
+    onEnd: () => void;
+    turnId: number;
+  }) {
+    // Strict mutual exclusion: never listen while speaking
+    if (this.isSpeakingState) {
+      console.log(`[VoiceService] Cannot listen while TTS is speaking. Turn #${callbacks.turnId} skipped.`);
+      return;
+    }
+
     if (!this.recognition) {
-      onError('Speech recognition is not supported in this browser.');
+      callbacks.onError('Speech recognition is not supported in this browser.');
       return;
     }
 
@@ -331,32 +371,184 @@ class VoiceService {
     this.playTone('listen_start');
     this.isListening = true;
 
+    let speechDetected = false;
+    let accumulatedTranscript = '';
+    let speechEndTimestamp = 0;
+    let silenceTimer: any = null;
+    let noSpeechTimeout: any = null;
+
+    // Start audio metering for hands-free visualizer and silence metering
+    this.startAudioMeter();
+
+    // Overall turn timeout if user says nothing at all (4.5s)
+    noSpeechTimeout = setTimeout(() => {
+      if (!speechDetected && this.isListening) {
+        console.log(`[VoiceService] Silence detected (no speech input in Turn #${callbacks.turnId})`);
+        this.stopListening();
+        callbacks.onSilence();
+      }
+    }, 4500);
+
+    const finishTurn = (transcript: string) => {
+      clearTimeout(silenceTimer);
+      clearTimeout(noSpeechTimeout);
+      this.stopAudioMeter();
+      if (!this.isListening) return;
+      this.isListening = false;
+      this.playTone('listen_stop');
+
+      const transcriptReceivedMs = Date.now();
+      const finalSpeechEnd = speechEndTimestamp || (transcriptReceivedMs - 400);
+
+      callbacks.onResult(transcript, {
+        speechEndMs: finalSpeechEnd,
+        transcriptReceivedMs,
+      });
+    };
+
+    this.recognition.continuous = true;
+    this.recognition.interimResults = true;
+
+    this.recognition.onstart = () => {
+      // recognition active
+    };
+
+    this.recognition.onspeechstart = () => {
+      speechDetected = true;
+      clearTimeout(noSpeechTimeout);
+    };
+
+    this.recognition.onspeechend = () => {
+      speechEndTimestamp = Date.now();
+      // Auto-end turn ~1s after speech ends
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => {
+        if (accumulatedTranscript.trim()) {
+          this.recognition?.stop();
+          finishTurn(accumulatedTranscript);
+        }
+      }, 1000);
+    };
+
     this.recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      onResult(transcript);
+      speechDetected = true;
+      clearTimeout(noSpeechTimeout);
+
+      let currentInterim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const item = event.results[i];
+        if (item.isFinal) {
+          accumulatedTranscript += ' ' + item[0].transcript;
+        } else {
+          currentInterim += item[0].transcript;
+        }
+      }
+
+      const activeText = (accumulatedTranscript + ' ' + currentInterim).trim();
+
+      // Reset ~1000ms silence detection after each spoken phrase
+      speechEndTimestamp = Date.now();
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => {
+        if (activeText) {
+          this.recognition?.stop();
+          finishTurn(activeText);
+        }
+      }, 1100);
     };
 
     this.recognition.onerror = (event: any) => {
+      clearTimeout(silenceTimer);
+      clearTimeout(noSpeechTimeout);
+      this.stopAudioMeter();
       this.isListening = false;
       this.playTone('listen_stop');
-      onError(event.error || 'Speech error occurred');
+
+      if (event.error === 'no-speech') {
+        callbacks.onSilence();
+      } else {
+        callbacks.onError(event.error || 'Speech recognition error');
+      }
     };
 
     this.recognition.onend = () => {
-      this.isListening = false;
-      this.playTone('listen_stop');
-      onEnd();
+      clearTimeout(silenceTimer);
+      clearTimeout(noSpeechTimeout);
+      this.stopAudioMeter();
+      if (this.isListening) {
+        this.isListening = false;
+        this.playTone('listen_stop');
+        if (accumulatedTranscript.trim()) {
+          finishTurn(accumulatedTranscript);
+        } else {
+          callbacks.onEnd();
+        }
+      }
     };
 
     try {
       this.recognition.start();
     } catch {
       this.isListening = false;
-      onError('Microphone access was blocked or busy.');
+      this.stopAudioMeter();
+      callbacks.onError('Microphone access was blocked or busy.');
     }
   }
 
+  private startAudioMeter() {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => {
+            this.audioMeterStream = stream;
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContextClass) return;
+            const ctx = new AudioContextClass();
+            const source = ctx.createMediaStreamSource(stream);
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 64;
+            source.connect(analyser);
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            this.audioMeterInterval = setInterval(() => {
+              if (!this.isListening) {
+                this.stopAudioMeter();
+                return;
+              }
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+              }
+              const avg = sum / dataArray.length;
+              const normalized = Math.min(1, avg / 128);
+              this.audioLevelListeners.forEach((fn) => fn(normalized));
+            }, 60);
+          })
+          .catch(() => {
+            // Audio metering optional fallback
+          });
+      }
+    } catch {
+      // Audio meter not supported or blocked
+    }
+  }
+
+  private stopAudioMeter() {
+    if (this.audioMeterInterval) {
+      clearInterval(this.audioMeterInterval);
+      this.audioMeterInterval = null;
+    }
+    if (this.audioMeterStream) {
+      this.audioMeterStream.getTracks().forEach((t) => t.stop());
+      this.audioMeterStream = null;
+    }
+    this.audioLevelListeners.forEach((fn) => fn(0));
+  }
+
   public stopListening() {
+    this.stopAudioMeter();
     if (this.recognition && this.isListening) {
       try {
         this.recognition.stop();

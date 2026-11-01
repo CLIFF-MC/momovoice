@@ -48,6 +48,12 @@ app.post('/api/tts', async (req, res) => {
         ? 'Spoken Ga language with natural Greater Accra rhythm and warm, friendly tone.'
         : language === 'dagbani'
         ? 'Spoken Dagbani (Dagbanli) Northern Ghanaian language with natural, fluent human pronunciation.'
+        : language === 'hausa'
+        ? 'Spoken authentic Ghanaian Hausa language with warm, natural cadence, clear pronunciation, and fluent rhythm.'
+        : language === 'krachi'
+        ? 'Spoken authentic Krachi (Kaakyi) language of the Oti Region (Dambai) of Ghana with natural North-Guang tonal cadence and warm pronunciation.'
+        : language === 'buem'
+        ? 'Spoken authentic Buem (Lelemi) language of the Oti Region (Jasikan/Bodada) of Ghana with natural tonal cadence and warm pronunciation.'
         : 'Warm, clear, natural Ghanaian English financial assistant tone.';
 
     const response = await ai.models.generateContent({
@@ -91,6 +97,37 @@ app.post('/api/tts', async (req, res) => {
     res.status(500).json({
       error: err?.message || 'Failed to synthesize natural speech',
     });
+  }
+});
+
+// Fastest Gemini Flash fallback for complex or unusual utterances (max 50 tokens, 0.0 temperature)
+app.post('/api/fast-intent', async (req, res) => {
+  try {
+    const { text, context } = req.body;
+    if (!text) return res.status(400).json({ error: 'Text is required' });
+    if (!ai) return res.status(503).json({ error: 'Gemini not configured on server', intent: 'UNKNOWN' });
+
+    const prompt = `Classify MTN MoMo voice input: "${text}".
+Return strict JSON: {"intent": "TRANSFER"|"AIRTIME"|"BILL"|"CASHOUT"|"BALANCE"|"YES"|"NO"|"CANCEL"|"REPEAT"|"SLOWER"|"FINGERPRINT"|"FACE"|"UNKNOWN", "amount": number|null, "recipient": string|null, "phone": string|null}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        maxOutputTokens: 60,
+        temperature: 0.0,
+        responseMimeType: 'application/json',
+      },
+    });
+
+    const parsedJson = response.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (parsedJson) {
+      res.json(JSON.parse(parsedJson));
+    } else {
+      res.json({ intent: 'UNKNOWN' });
+    }
+  } catch (err: any) {
+    res.json({ intent: 'UNKNOWN' });
   }
 });
 

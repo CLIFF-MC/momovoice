@@ -1,4 +1,4 @@
-export type GhanaianLanguage = 'en' | 'twi' | 'fante' | 'ewe' | 'ga' | 'dagbani';
+export type GhanaianLanguage = 'en' | 'twi' | 'fante' | 'ewe' | 'ga' | 'dagbani' | 'hausa' | 'krachi' | 'buem';
 
 export interface LanguageOption {
   code: GhanaianLanguage;
@@ -19,6 +19,26 @@ export type AssistantState =
   | 'RESULT_ANNOUNCED'
   | 'ERROR_RECOVERY';
 
+export type BiometricMethod = 'fingerprint' | 'face' | null;
+
+export type VoiceFlowStep =
+  | 'IDLE'
+  | 'WELCOME_ASK_TASK'
+  | 'ASK_RECIPIENT'
+  | 'AWAITING_CONTACTS_PERMISSION'
+  | 'RESOLVING_CONTACT_CHOICE'
+  | 'CONFIRM_PHONE_NUMBER'
+  | 'CROSS_CHECK_REGISTERED_NAME'
+  | 'ASK_AMOUNT'
+  | 'REVIEW_TRANSFER_QUOTE'
+  | 'BIOMETRIC_AUTH'
+  | 'ANYTHING_ELSE'
+  | 'SETUP_BIOMETRICS_REQUIRED'
+  | 'SETUP_BIOMETRICS_NO_HARDWARE'
+  | 'SETUP_BIOMETRICS_NOT_ENROLLED'
+  | 'SETUP_BIOMETRICS_CHOICE'
+  | 'SETUP_BIOMETRICS_TEST';
+
 export type IntentType =
   | 'BALANCE_CHECK'
   | 'PREPARE_TRANSFER'
@@ -29,6 +49,12 @@ export type IntentType =
   | 'CANCEL'
   | 'TRANSACTION_STATUS'
   | 'REPEAT'
+  | 'SLOWER'
+  | 'ANSWER_YES'
+  | 'ANSWER_NO'
+  | 'SELECT_OPTION'
+  | 'CHOOSE_FINGERPRINT'
+  | 'CHOOSE_FACE'
   | 'HELP'
   | 'CHANGE_AMOUNT'
   | 'CHANGE_RECIPIENT'

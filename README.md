@@ -13,6 +13,9 @@ The assistant converses naturally in local Ghanaian languages and dialects:
 - **Eʋegbe / Volta Ewe** (Volta Region)
 - **Gã** (Greater Accra Region)
 - **Dagbanli / Dagbani** (Northern Region)
+- **Hausa** (National / Zongo Communities)
+- **Krachi / Kaakyi** (Oti Region - Dambai, Krachi East/West/Nchumuru)
+- **Buem / Lɛlɛmi** (Oti Region - Jasikan, Bodada, Worawora)
 - **Ghanaian English** (National)
 
 ### 2. Zero-PIN Security Architecture
@@ -98,17 +101,17 @@ http://localhost:3000
 
 ## 📱 Voice Command Cheat Sheet
 
-| Action | English | Asante Twi | Eʋegbe (Ewe) | Gã | Dagbani |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Check Balance** | *"Check my balance"* | *"Hwɛ me sika"* | *"Kpɔ nye ga me"* | *"Kwɛmɔ mishika"* | *"Nyama n laɣifu"* |
-| **Send Money** | *"Send 20 cedis to Ama"* | *"Mene cedis aduonu kɔma Ama"* | *"Ɖo cedi blaeve na Ama"* | *"Kɛ cedi nyɔŋmai enyɔ maje Ama"* | *"Timi Ama cedi pishi"* |
-| **Send to Number**| *"Send 50 cedis to 0244123456"* | *"Mene cedis aduonum kɔma 0244123456"* | *"Ɖo cedi blaatɔ̃ na 0244123456"* | *"Kɛ cedi nyɔŋmai enumɔ maje 0244123456"* | *"Timi 0244123456 cedi pihinu"* |
-| **Buy Airtime** | *"Buy 10 cedis airtime"* | *"Tɔ airtime cedis du"* | *"Ƒle kadodo cedi ewo"* | *"Hé airtime cedi nyɔŋma"* | *"Daɣim airtime cedi pia"* |
-| **Pay Bill** | *"Pay ECG 50 cedis"* | *"Tua ECG bill cedis aduonum"* | *"Xe ECG fe cedi blaatɔ̃"* | *"Wo ECG nyɛmɔ cedi nyɔŋmai enumɔ"* | *"Yo ECG samli cedi pihinu"* |
-| **Cash Out** | *"Cash out 50 cedis"* | *"Gye sika cedis aduonum"* | *"Ɖe ga le agent gbɔ cedi blaatɔ̃"* | *"Tsi shika cedi nyɔŋmai enumɔ"* | *"Yi laɣifu cedi pihinu"* |
-| **Confirm Action**| *"Confirm"* / *"Yes"* | *"Aane"* | *"Eẽ"* | *"Hɛɛ"* | *"Iyi"* |
-| **Cancel Action** | *"Cancel"* / *"Stop"* | *"Gyae"* | *"Tɔe"* | *"Kpa"* | *"Chɛli"* |
-| **Repeat Audio** | *"Repeat that"* | *"Ka bio"* | *"Gblɔe ake"* | *"Kɛɛ ekoŋŋ"* | *"Labi yeli"* |
+| Action | English | Asante Twi | Eʋegbe (Ewe) | Hausa | Krachi (Oti) | Buem (Lɛlɛmi) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Check Balance** | *"Check my balance"* | *"Hwɛ me sika"* | *"Kpɔ nye ga me"* | *"Duba kudi na"* | *"Kere me sika"* | *"Kere me sika"* |
+| **Send Money** | *"Send 20 cedis to Ama"* | *"Mene cedis aduonu kɔma Ama"* | *"Ɖo cedi blaeve na Ama"* | *"Aika cedis ashirin zuwa Ama"* | *"Mene cedis aduɔnyɔ kɔma Ama"* | *"Mene cedis aduɔnyɔ kɔma Ama"* |
+| **Send to Number**| *"Send 50 cedis to 0244123456"* | *"Mene cedis aduonum kɔma 0244123456"* | *"Ɖo cedi blaatɔ̃ na 0244123456"* | *"Tura cedis hamsin zuwa 0244123456"* | *"Mene cedis aduɔnoo kɔma 0244123456"* | *"Mene cedis aduɔnɔ kɔma 0244123456"* |
+| **Buy Airtime** | *"Buy 10 cedis airtime"* | *"Tɔ airtime cedis du"* | *"Ƒle kadodo cedi ewo"* | *"Sayi katin waya cedis goma"* | *"Tɔ airtime cedis idu"* | *"Tɔ airtime cedis lefu"* |
+| **Pay Bill** | *"Pay ECG 50 cedis"* | *"Tua ECG bill cedis aduonum"* | *"Xe ECG fe cedi blaatɔ̃"* | *"Biya kudin ECG cedis hamsin"* | *"Tua ECG bill cedis aduɔnoo"* | *"Tua ECG bill cedis aduɔnɔ"* |
+| **Cash Out** | *"Cash out 50 cedis"* | *"Gye sika cedis aduonum"* | *"Ɖe ga le agent gbɔ"* | *"Cire kudi cedis hamsin"* | *"Gye sika cedis aduɔnoo"* | *"Gye sika cedis aduɔnɔ"* |
+| **Confirm Action**| *"Confirm"* / *"Yes"* | *"Aane"* | *"Eẽ"* | *"Eh"* / *"Tabbatar"* | *"Ee"* | *"Ee"* |
+| **Cancel Action** | *"Cancel"* / *"Stop"* | *"Gyae"* | *"Tɔe"* | *"Soke"* / *"A'a"* | *"Gyaa"* | *"Gyaa"* |
+| **Repeat Audio** | *"Repeat that"* | *"Ka bio"* | *"Gblɔe ake"* | *"Sake fada"* | *"Mesan ka"* | *"Mesan ka"* |
 
 ---
 
@@ -126,7 +129,7 @@ http://localhost:3000
 │   ├── types/
 │   │   └── momo.ts             # TypeScript definitions for MoMo accounts, drafts, transactions, and events
 │   ├── data/
-│   │   ├── ghanaianLanguages.ts# Localizations, dialect phrases, spoken numbers in 6 languages
+│   │   ├── ghanaianLanguages.ts# Localizations, dialect phrases, spoken numbers in 9 Ghanaian languages
 │   │   └── mockData.ts         # Initial MoMo balances, KYC contacts, fee calculation rules
 │   ├── services/
 │   │   ├── momoService.ts      # MoMo sandbox API engine (Transfer, Airtime, Bill Pay, Cash Out, Idempotency)
